@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISC2 CC Exam Prep — PatchSec</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #0a0e12;
+  --panel: #10151b;
+  --panel-2: #161d26;
+  --border: #232c37;
+  --border-soft: #1a222b;
+  --text: #dbe2e9;
+  --text-dim: #7c8794;
+  --text-faint: #4a5460;
+  --blue: #4f9eff;
+  --blue-soft: #1a324f;
+  --green: #3ecf8e;
+  --green-soft: #123227;
+  --red: #f0555a;
+  --red-soft: #3a1c1f;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+  --radius: 4px;
+}
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; }
+body {
+  font-family: var(--mono);
+  background: radial-gradient(ellipse at top, #0d1219 0%, #05070a 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 28px 14px;
+}
+.cc-app {
+  width: 100%;
+  max-width: 720px;
+  background: var(--bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 24px 70px -24px rgba(0,0,0,0.7);
+  height: fit-content;
+}
+.term-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 14px;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--border);
+}
+.dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink:0; }
+.dot.r { background: #ff5f57; }
+.dot.y { background: #febc2e; }
+.dot.g { background: #28c840; }
+.term-path {
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cursor {
+  display: inline-block;
+  width: 7px;
+  height: 15px;
+  background: var(--blue);
+  margin-left: 5px;
+  vertical-align: -3px;
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+.term-body { padding: 26px 24px; }
+
+.eyebrow {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+.title {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+.subtitle {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: 0 0 22px;
+  max-width: 52ch;
+}
+.hint {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  margin: 14px 0 18px;
+}
+
+.d-idx { font-size: 12px; color: var(--text-faint); width: 20px; flex-shrink:0; }
+.d-name { font-size: 13px; color: var(--text); flex: 1 1 180px; min-width: 0; }
+.d-bar-track {
+  flex: 1 1 90px;
+  height: 6px;
+  background: var(--panel-2);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+}
+.d-bar-fill {
+  display:block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--green));
+  width: 0%;
+  transition: width 0.9s cubic-bezier(.2,.8,.2,1);
+}
+.d-weight { font-size: 12px; color: var(--text-dim); width: 36px; text-align: right; flex-shrink:0; }
+.d-acc { font-size: 10.5px; color: var(--text-faint); width: 40px; text-align: right; flex-shrink:0; }
+
+.domain-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 8px;
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid var(--border-soft);
+  background: none;
+  font-family: var(--mono);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+.domain-row:hover { background: var(--panel-2); }
+.domain-row:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+.domain-row:last-of-type { border-bottom: none; }
+
+.domain-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.domain-stat-row:last-of-type { border-bottom: none; }
+
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.btn {
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 11px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.btn:hover { border-color: var(--blue); color: #fff; }
+.btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.btn.primary { background: var(--blue-soft); border-color: var(--blue); color: #cfe4ff; }
+.btn.primary:hover { background: var(--blue); color: #05131f; }
+.btn[disabled] { opacity: 0.35; cursor: not-allowed; }
+.btn[disabled]:hover { border-color: var(--border); color: var(--text); }
+
+.stat-line { font-size: 11.5px; color: var(--text-faint); margin-top: 18px; }
+
+.qmeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 14px;
+}
+.qprogress-track {
+  height: 3px;
+  background: var(--panel-2);
+  margin-bottom: 22px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.qprogress-fill { height: 100%; background: var(--blue); transition: width .3s; }
+
+.qtext { font-size: 15px; line-height: 1.55; color: var(--text); margin-bottom: 20px; }
+
+.opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color .12s, background .12s;
+}
+.opt:hover:not([disabled]) { border-color: var(--blue); }
+.opt:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.opt .k { color: var(--text-faint); flex-shrink: 0; }
+.opt-text { flex: 1; }
+.opt[disabled] { cursor: default; }
+.opt.correct { border-color: var(--green); background: var(--green-soft); }
+.opt.correct .k { color: var(--green); }
+.opt.wrong { border-color: var(--red); background: var(--red-soft); }
+.opt.wrong .k { color: var(--red); }
+.tag { margin-left: auto; font-size: 11px; letter-spacing: .04em; flex-shrink:0; }
+.opt.correct .tag { color: var(--green); }
+.opt.wrong .tag { color: var(--red); }
+
+.explain {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--panel-2);
+  border-left: 2px solid var(--blue);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  animation: fadein .25s ease;
+}
+@keyframes fadein { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.explain b { color: var(--text); }
+
+.footer-row { display:flex; justify-content: space-between; align-items:center; margin-top: 18px; }
+.link-btn { background:none; border:none; color: var(--text-faint); font-family: var(--mono); font-size:12px; cursor:pointer; text-decoration: underline; padding:4px 0; }
+.link-btn:hover { color: var(--text-dim); }
+.link-btn:focus-visible { outline: 2px solid var(--blue); }
+
+.score-big { font-size: 42px; font-weight: 700; color: var(--text); margin: 4px 0 2px; }
+.score-sub { font-size: 12px; color: var(--text-faint); margin-bottom:22px; }
+
+@media (max-width: 480px) {
+  .term-body { padding: 20px 16px; }
+  .d-name { flex-basis: 110px; font-size: 12px; }
+  .d-acc { display:none; }
+  .score-big { font-size: 34px; }
+  .title { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor { animation: none; opacity: 1; }
+  .d-bar-fill { transition: none; }
+  .explain { animation: none; }
+}
+</style>
+</head>
+<body>
+<div class="cc-app">
+  <div class="term-bar">
+    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+    <span class="term-path" id="termPath">patch@cc-exam:~$ ./start_prep.sh</span>
+  </div>
+  <div class="term-body" id="app"></div>
+</div>
+
+<script>
+var DOMAINS = [
+  {id:1, name:"Security Principles", slug:"security-principles", weight:26},
+  {id:2, name:"Business Continuity, DR & Incident Response", slug:"bc-dr-ir", weight:10},
+  {id:3, name:"Access Control Concepts", slug:"access-control", weight:22},
+  {id:4, name:"Network Security", slug:"network-security", weight:24},
+  {id:5, name:"Security Operations", slug:"security-operations", weight:18}
+];
+
+var QUESTIONS = [
+{id:1,domain:1,text:"Which component of the CIA triad ensures that data has not been altered by unauthorized parties?",opts:["Confidentiality","Integrity","Availability","Non-repudiation"],correct:1,exp:"Integrity guarantees information stays accurate and unmodified except by authorized action. Confidentiality protects against unauthorized disclosure, availability ensures access when needed, and non-repudiation prevents denial of an action."},
+{id:2,domain:1,text:"A company encrypts customer records so only authorized staff can read them. Which CIA principle is being enforced?",opts:["Availability","Confidentiality","Integrity","Accountability"],correct:1,exp:"Encryption restricts who can view data, which is the definition of confidentiality. It does not by itself confirm the data is unchanged (integrity) or guarantee uptime (availability)."},
+{id:3,domain:1,text:"A ransomware attack encrypts a hospital's patient database, making it inaccessible to doctors. Which security principle has been most directly violated?",opts:["Confidentiality","Integrity","Availability","Authentication"],correct:2,exp:"Ransomware primarily denies legitimate access to data, which is an availability failure. The immediate harm described is authorized staff being unable to use the data, even though confidentiality was also technically breached."},
+{id:4,domain:1,text:"What does non-repudiation guarantee in a security context?",opts:["That data is encrypted while stored","That a party cannot deny having performed an action","That a system is always available","That only authorized users can log in"],correct:1,exp:"Non-repudiation provides proof of origin and integrity of a message or action so the sender cannot later deny sending it, typically achieved through digital signatures and audit logs."},
+{id:5,domain:1,text:"What is the primary difference between authentication and authorization?",opts:["Authentication grants permissions; authorization proves identity","Authentication proves identity; authorization determines what an identified user can do","They are the same process","Authorization happens before authentication"],correct:1,exp:"Authentication verifies who a user is, such as via a password or biometrics, while authorization determines what that verified identity is permitted to access or do."},
+{id:6,domain:1,text:"Which type of security control is a fence around a data center?",opts:["Technical","Administrative","Physical","Detective"],correct:2,exp:"A fence is a physical control because it restricts physical access to a location. Technical controls involve technology like firewalls, and administrative controls involve policies and procedures."},
+{id:7,domain:1,text:"A security awareness training program that teaches employees to recognize phishing emails is an example of which control category?",opts:["Physical control","Administrative control","Technical control","Corrective control"],correct:1,exp:"Training and policy-driven measures fall under administrative controls, which govern human behavior and organizational process rather than physical barriers or technology."},
+{id:8,domain:1,text:"Which control type is designed to identify that a security incident has already occurred?",opts:["Preventive","Deterrent","Detective","Compensating"],correct:2,exp:"Detective controls, such as intrusion detection systems and audit logs, identify and alert on incidents after they happen. Preventive controls try to stop incidents before they occur."},
+{id:9,domain:1,text:"An organization installs security cameras that are clearly visible to discourage theft. This is primarily an example of which control type?",opts:["Deterrent","Corrective","Detective","Compensating"],correct:0,exp:"Visible cameras are meant to discourage bad behavior before it happens, which is the definition of a deterrent control, even though the same cameras can also serve a detective function."},
+{id:10,domain:1,text:"Restoring a system from backup after a malware infection is an example of which control type?",opts:["Preventive","Corrective","Deterrent","Physical"],correct:1,exp:"Corrective controls repair or restore systems after an incident has caused harm. Backups and restoration reduce the impact of an event that has already occurred."},
+{id:11,domain:1,text:"An organization cannot afford a full redundant data center, so it instead increases backup frequency and staff monitoring. This is an example of which control type?",opts:["Preventive control","Compensating control","Deterrent control","Physical control"],correct:1,exp:"A compensating control is an alternative safeguard used when the primary control is not feasible, providing a similar level of protection through different means."},
+{id:12,domain:1,text:"What is the general relationship commonly used to describe risk?",opts:["Risk = Asset x Vulnerability","Risk is a function of a threat exploiting a vulnerability against an asset, producing impact","Risk = Control x Threat","Risk = Availability x Confidentiality"],correct:1,exp:"Risk is commonly understood as a threat exploiting a vulnerability against an asset to cause impact. Remove any one factor, no threat, no vulnerability, or no asset value, and risk drops to near zero."},
+{id:13,domain:1,text:"A company purchases cybersecurity insurance instead of building additional defenses. Which risk treatment strategy is this?",opts:["Risk avoidance","Risk mitigation","Risk transfer","Risk acceptance"],correct:2,exp:"Buying insurance shifts the financial impact of a risk to a third party, which is risk transfer. It does not reduce the likelihood of the event, which mitigation would do, or eliminate the activity, which avoidance would do."},
+{id:14,domain:1,text:"A business discontinues an online feature entirely because the associated risk is too high to manage. Which risk treatment is this?",opts:["Risk avoidance","Risk mitigation","Risk transfer","Risk acceptance"],correct:0,exp:"Eliminating the activity that creates the risk entirely is risk avoidance. Risk mitigation would instead reduce the risk while keeping the feature running."},
+{id:15,domain:1,text:"A small business decides a control's cost outweighs the low-impact risk it addresses, and takes no action. Which risk treatment is this?",opts:["Risk transfer","Risk acceptance","Risk mitigation","Risk avoidance"],correct:1,exp:"Risk acceptance means the organization acknowledges a risk and chooses to tolerate it, usually because the cost of treatment exceeds the potential impact."},
+{id:16,domain:1,text:"What is the key difference between qualitative and quantitative risk assessment?",opts:["Qualitative uses monetary values; quantitative uses relative ratings","Qualitative uses relative ratings like high, medium, or low; quantitative uses numerical or monetary values","They always produce identical results","Quantitative only applies to physical security"],correct:1,exp:"Qualitative assessment ranks risks using descriptive scales such as high, medium, or low, while quantitative assessment assigns numerical or monetary values, such as calculating Annual Loss Expectancy."},
+{id:17,domain:1,text:"An asset is worth $50,000 and a threat is expected to destroy 20% of its value each time it occurs. What is the Single Loss Expectancy (SLE)?",opts:["$5,000","$10,000","$20,000","$50,000"],correct:1,exp:"SLE equals Asset Value multiplied by Exposure Factor: $50,000 x 0.20 = $10,000."},
+{id:18,domain:1,text:"If the SLE is $10,000 and the event is expected to occur twice per year, what is the Annual Loss Expectancy (ALE)?",opts:["$5,000","$10,000","$20,000","$2,000"],correct:2,exp:"ALE equals SLE multiplied by the Annualized Rate of Occurrence: $10,000 x 2 = $20,000."},
+{id:19,domain:1,text:"Under the ISC2 Code of Ethics, which of the following is the first and highest-priority canon?",opts:["Advance and protect the profession","Act honorably, honestly, justly, responsibly, and legally","Protect society, the common good, necessary public trust and confidence, and the infrastructure","Provide diligent and competent service to principals"],correct:2,exp:"The ISC2 Code of Ethics lists its canons in priority order, and protecting society, the common good, public trust, and the infrastructure is the first and highest-priority canon."},
+{id:20,domain:1,text:"A security document states the specific brand and model of firewall every department must use. What type of governance document is this most likely to be?",opts:["Policy","Standard","Guideline","Law"],correct:1,exp:"Standards specify mandatory, specific requirements, such as particular products or configurations, that support a broader policy. Policies state high-level intent, while guidelines offer recommended but non-mandatory advice."},
+{id:21,domain:1,text:"What distinguishes a guideline from a standard in security governance?",opts:["Guidelines are mandatory; standards are optional","Guidelines are recommended best practices; standards are mandatory requirements","They mean the same thing","Guidelines only apply to physical security"],correct:1,exp:"Standards must be followed to comply with policy, while guidelines offer recommended, flexible advice on how to achieve an objective."},
+{id:22,domain:1,text:"What is the difference between due care and due diligence?",opts:["Due care is investigating risk; due diligence is acting on findings","Due diligence is the research done before acting; due care is the continued effort to act responsibly afterward","They mean the same thing","Due diligence only applies after an incident"],correct:1,exp:"Due diligence refers to the research and investigation performed before making a decision, while due care refers to the ongoing, reasonable actions taken to maintain security and meet obligations."},
+{id:23,domain:1,text:"Which principle limits a user's access rights to only what is strictly necessary to perform their job function?",opts:["Separation of duties","Least privilege","Defense in depth","Non-repudiation"],correct:1,exp:"Least privilege restricts each user or process to the minimum access needed, reducing the potential damage from error, misuse, or compromise."},
+{id:24,domain:1,text:"Requiring two different employees to each complete part of a financial transaction before it is approved is an example of which principle?",opts:["Least privilege","Separation of duties","Defense in depth","Risk transfer"],correct:1,exp:"Separation of duties divides critical tasks among multiple people so no single individual can complete a sensitive process alone, reducing fraud and error risk."},
+{id:25,domain:1,text:"What is the core idea behind defense in depth?",opts:["Relying on a single very strong control","Layering multiple, overlapping security controls so that if one fails, others still protect the asset","Accepting all risk to reduce cost","Outsourcing all security responsibility to a vendor"],correct:1,exp:"Defense in depth uses multiple layers of physical, technical, and administrative controls so that the failure of any one layer does not fully expose the asset."},
+{id:26,domain:1,text:"In a zero trust security model, what is the guiding assumption?",opts:["Users inside the network perimeter are automatically trusted","No user or device should be trusted by default, even inside the network, and must be continuously verified","Only external users need to be authenticated","Firewalls alone are sufficient protection"],correct:1,exp:"Zero trust assumes breach and requires continuous verification of every user and device regardless of location, rather than granting implicit trust based on network location."},
+{id:27,domain:2,text:"What is the primary goal of a Business Continuity Plan (BCP)?",opts:["To restore IT infrastructure after a disaster","To keep critical business functions operating during and after a disruption","To prosecute attackers after a breach","To encrypt sensitive data"],correct:1,exp:"A BCP focuses on maintaining or quickly resuming essential business operations during a disruption, which is broader than just restoring IT systems."},
+{id:28,domain:2,text:"What is the primary goal of a Disaster Recovery Plan (DRP)?",opts:["To maintain employee morale","To restore IT systems, applications, and data after a disruptive event","To train staff on phishing recognition","To set organizational risk appetite"],correct:1,exp:"A DRP focuses specifically on restoring technology infrastructure, systems, and data after a disaster, and is typically a subset of the broader BCP."},
+{id:29,domain:2,text:"What does a Business Impact Analysis (BIA) primarily help an organization identify?",opts:["The technical specifications of firewalls","Critical business functions and the impact of their disruption over time","The names of all employees","The color scheme of an incident dashboard"],correct:1,exp:"A BIA identifies critical processes and dependencies and quantifies the operational and financial impact of downtime, which informs recovery priorities and timeframes."},
+{id:32,domain:2,text:"A company can tolerate losing at most 1 hour of data but needs systems restored within 4 hours. Which pair of terms describes these two requirements respectively?",opts:["RTO of 1 hour, RPO of 4 hours","RPO of 1 hour, RTO of 4 hours","MTD of 1 hour, RPO of 4 hours","SLE of 1 hour, ARO of 4 hours"],correct:1,exp:"Data loss tolerance is RPO, which is 1 hour here, and the time to restore systems is RTO, which is 4 hours here."},
+{id:33,domain:2,text:"Which backup type captures all data changed since the last full backup, regardless of any incremental backups taken since?",opts:["Full backup","Incremental backup","Differential backup","Snapshot backup"],correct:2,exp:"A differential backup includes all changes since the last full backup, growing larger each day until the next full backup, unlike incremental backups which only capture changes since the last backup of any type."},
+{id:34,domain:2,text:"Which type of alternate recovery site is fully equipped and can take over operations within minutes to hours?",opts:["Cold site","Warm site","Hot site","Mobile site"],correct:2,exp:"A hot site is a fully operational duplicate facility with up-to-date data and systems, allowing near-immediate failover, whereas warm sites need some setup and cold sites take much longer to become operational."},
+{id:35,domain:2,text:"What best describes a cold site in disaster recovery planning?",opts:["A fully staffed and operational duplicate facility","A facility with basic infrastructure like power and space but no pre-installed systems or data","A site with servers configured but not updated","A cloud-only backup solution"],correct:1,exp:"A cold site provides physical space, power, and connectivity but requires equipment and data to be brought in and configured before use, making it the slowest and cheapest option to activate."},
+{id:36,domain:2,text:"What is the correct general order of the incident response process?",opts:["Containment, Preparation, Detection, Eradication, Recovery, Lessons Learned","Preparation, Detection and Identification, Containment, Eradication, Recovery, Lessons Learned","Detection, Preparation, Recovery, Containment, Eradication","Eradication, Containment, Preparation, Detection, Recovery"],correct:1,exp:"The standard incident response lifecycle begins with Preparation, followed by Detection and Identification, Containment to limit damage, Eradication of the root cause, Recovery of normal operations, and finally Lessons Learned."},
+{id:37,domain:2,text:"During an active ransomware outbreak, isolating infected machines from the network to stop further spread is part of which incident response phase?",opts:["Preparation","Containment","Eradication","Lessons learned"],correct:1,exp:"Containment focuses on limiting the scope and impact of an ongoing incident, such as isolating affected systems, before the threat is fully removed."},
+{id:38,domain:2,text:"What is the main purpose of a lessons learned review after an incident?",opts:["To assign blame to individual employees","To identify what happened, what worked, and what should improve for future incidents","To immediately restore all systems","To notify law enforcement"],correct:1,exp:"The lessons learned phase analyzes the incident response process itself to identify gaps and improvements, strengthening preparation for future incidents rather than assigning individual blame."},
+{id:39,domain:3,text:"What do the three components of the AAA framework stand for?",opts:["Authentication, Authorization, Accounting","Access, Audit, Availability","Authentication, Audit, Authorization","Accounting, Access, Authorization"],correct:0,exp:"AAA stands for Authentication, which verifies identity, Authorization, which grants permissions, and Accounting, which tracks and logs user activity."},
+{id:40,domain:3,text:"A user logs in with a password and a one-time code sent to their phone. What authentication concept does this demonstrate?",opts:["Single sign-on","Multi-factor authentication","Federation","Role-based access control"],correct:1,exp:"Using two different factors, something you know and something you have, is multi-factor authentication, which strengthens identity verification beyond a password alone."},
+{id:41,domain:3,text:"Which authentication factor category does a fingerprint scan belong to?",opts:["Something you know","Something you have","Something you are","Somewhere you are"],correct:2,exp:"Biometric characteristics such as fingerprints belong to the something you are factor category, distinct from knowledge-based passwords or possession-based tokens."},
+{id:42,domain:3,text:"What does Discretionary Access Control (DAC) allow?",opts:["A central authority strictly assigns all access based on classification labels","The owner of a resource decides who is granted access to it","Access is granted only based on job role","Access is granted based on a fixed set of system rules only"],correct:1,exp:"In DAC, the resource owner has discretion to grant or restrict access to other users, offering flexibility but less centralized control than MAC."},
+{id:43,domain:3,text:"Which access control model uses security labels such as Confidential or Top Secret and is common in military and government systems?",opts:["DAC","MAC","RBAC","ABAC"],correct:1,exp:"Mandatory Access Control enforces access based on fixed classification labels and clearance levels set by a central authority, and users cannot alter these permissions themselves."},
+{id:44,domain:3,text:"An organization grants system access based on job titles such as HR Manager or IT Support, with predefined permission sets for each. Which access control model is this?",opts:["DAC","MAC","RBAC","Rule-based access control"],correct:2,exp:"Role-Based Access Control assigns permissions to roles rather than individuals, and users inherit permissions based on their assigned role, simplifying administration."},
+{id:45,domain:3,text:"Which access control model grants or denies access dynamically based on a combination of user, resource, and environmental attributes such as department, time of day, and device location?",opts:["DAC","MAC","RBAC","ABAC"],correct:3,exp:"Attribute-Based Access Control evaluates multiple attributes in real time to make access decisions, offering more granular and context-aware control than role-based approaches alone."},
+{id:46,domain:3,text:"What is the need to know principle primarily concerned with?",opts:["Limiting access to information based on necessity for a specific task, even if the user holds sufficient clearance","Requiring all employees to know general company policy","Ensuring all employees know how to reset their passwords","Making all internal data publicly accessible"],correct:0,exp:"Need to know restricts access to specific information to only those who require it to perform their duties, even if they hold an appropriate clearance level, complementing least privilege."},
+{id:47,domain:3,text:"What is a mantrap used for in physical security?",opts:["Encrypting data in transit","A small space with two interlocking doors that allows only one person through at a time","Detecting network intrusions","Storing backup tapes securely"],correct:1,exp:"A mantrap traps an individual between two doors, verifying identity before allowing entry and preventing an unauthorized person from following someone through."},
+{id:48,domain:3,text:"What is tailgating, also called piggybacking, in physical security?",opts:["Encrypting data with an outdated protocol","An unauthorized person following an authorized person through a secured door without their own credentials","A type of malware spread through USB devices","A method of network traffic analysis"],correct:1,exp:"Tailgating occurs when someone without proper access gains entry by closely following an authorized individual through a secured door, exploiting courtesy rather than a technical flaw."},
+{id:49,domain:3,text:"In biometric systems, what does a false acceptance mean?",opts:["An authorized user is incorrectly denied access","An unauthorized user is incorrectly granted access","The system fails to power on","The system requires a password reset"],correct:1,exp:"A false acceptance, also called a Type II error, occurs when a biometric system incorrectly identifies an unauthorized individual as authorized and grants access."},
+{id:50,domain:3,text:"What does Single Sign-On (SSO) allow a user to do?",opts:["Log in once and access multiple independent systems without re-authenticating to each","Use a single password for one application only","Access only one system per day","Bypass all authentication controls"],correct:0,exp:"SSO allows a user to authenticate once and then access multiple connected applications or systems without logging in again to each one separately."},
+{id:51,domain:3,text:"What is federation in identity and access management?",opts:["A method to physically secure a data center","An arrangement that allows identities and authentication to be trusted and shared across separate organizations or systems","A type of firewall configuration","A backup strategy"],correct:1,exp:"Federated identity allows a user's credentials from one trusted domain, such as their employer, to be used to access resources in another domain without creating a separate account."},
+{id:52,domain:3,text:"What is the purpose of an account lockout policy?",opts:["To permanently disable all accounts after 90 days","To temporarily disable an account after a set number of failed login attempts","To automatically grant admin rights after repeated logins","To speed up the login process"],correct:1,exp:"Account lockout policies protect against brute-force password guessing by locking an account after a defined number of consecutive failed attempts."},
+{id:53,domain:3,text:"What does deprovisioning refer to in identity and access management?",opts:["Creating a new user account","Granting elevated privileges to an administrator","Removing or disabling a user's access rights, typically when they leave an organization or change roles","Encrypting a user's stored files"],correct:2,exp:"Deprovisioning revokes a user's system access and accounts, which is critical to perform promptly when an employee departs or changes roles to prevent lingering unauthorized access."},
+{id:54,domain:3,text:"Why is timely deprovisioning of former employees' accounts considered a critical security practice?",opts:["It reduces electricity costs","It prevents former employees from retaining unauthorized access to systems and data","It improves network speed","It only matters for physical access badges"],correct:1,exp:"Failing to promptly disable access for departed employees leaves an active account that could be used for unauthorized access, making timely deprovisioning an important control."},
+{id:55,domain:3,text:"What is Privileged Access Management (PAM) primarily concerned with?",opts:["Managing guest Wi-Fi access","Controlling, monitoring, and securing accounts with elevated permissions, such as administrator accounts","Encrypting all outbound email","Managing physical building access badges only"],correct:1,exp:"PAM focuses specifically on securing and closely monitoring privileged accounts, such as administrators and root users, because their compromise poses outsized risk compared to standard accounts."},
+{id:56,domain:3,text:"Which of the following is an example of a rule-based access control implementation?",opts:["A firewall that allows or denies traffic based on a predefined set of if-then rules","A manager granting file access to direct reports at their own discretion","Access based purely on job title","Access based on a data classification label alone"],correct:0,exp:"Rule-based access control applies a fixed set of rules, such as firewall ACL rules, to determine access or traffic flow, independent of user identity or role."},
+{id:57,domain:3,text:"Why might an organization enforce a minimum password length and complexity requirement?",opts:["To make passwords easier to guess","To reduce the likelihood of successful brute-force or dictionary attacks","To reduce server storage costs","To comply with backup retention rules"],correct:1,exp:"Longer, more complex passwords increase the number of possible combinations an attacker must try, making brute-force and dictionary attacks significantly less practical."},
+{id:58,domain:3,text:"A hospital only allows nurses to view the records of patients currently assigned to them, not all patients in the hospital. This is best described as an application of which principle?",opts:["Separation of duties","Need to know","Non-repudiation","Risk transfer"],correct:1,exp:"Restricting access to only the specific information required for a person's current task, even though they may be generally authorized to view patient records, exemplifies need to know."},
+{id:101,domain:3,text:"In biometric systems, what does a false rejection, also called a Type I error, mean?",opts:["An unauthorized user is incorrectly granted access","An authorized user is incorrectly denied access","The biometric sensor overheats","The system automatically logs the user out"],correct:1,exp:"A false rejection, or Type I error, occurs when a biometric system incorrectly denies access to a legitimate, authorized user. This is the counterpart to a false acceptance, or Type II error, where an unauthorized user is incorrectly let in."},
+{id:102,domain:3,text:"What does provisioning refer to in the identity and access management lifecycle?",opts:["Removing a departed employee's access","Creating a user account and granting the access rights required for a new role","Auditing existing user permissions for compliance","Resetting a user's forgotten password"],correct:1,exp:"Provisioning is the process of creating an account and granting the access rights needed when a new employee joins or a role changes. It is the counterpart to deprovisioning, which removes access once it is no longer needed."},
+{id:59,domain:4,text:"How many layers does the OSI model have?",opts:["4","5","7","9"],correct:2,exp:"The OSI model has seven layers: Physical, Data Link, Network, Transport, Session, Presentation, and Application."},
+{id:60,domain:4,text:"At which OSI layer do routers primarily operate, making forwarding decisions based on IP addresses?",opts:["Layer 2, Data Link","Layer 3, Network","Layer 4, Transport","Layer 7, Application"],correct:1,exp:"Routers operate at Layer 3, the Network layer, where logical IP addressing is used to determine the best path for forwarding packets between networks."},
+{id:61,domain:4,text:"At which OSI layer do switches typically operate, using MAC addresses to forward frames?",opts:["Layer 1, Physical","Layer 2, Data Link","Layer 3, Network","Layer 4, Transport"],correct:1,exp:"Traditional switches operate at Layer 2, the Data Link layer, forwarding frames within a local network based on MAC addresses."},
+{id:62,domain:4,text:"Which of the following is a private IP address range as defined by RFC 1918?",opts:["8.8.8.0/24","192.168.0.0/16","172.32.0.0/16","1.1.1.0/24"],correct:1,exp:"192.168.0.0/16 is one of the three RFC 1918 private address ranges, along with 10.0.0.0/8 and 172.16.0.0/12, reserved for private networks and not routable on the public internet."},
+{id:63,domain:4,text:"What is the primary purpose of a MAC address?",opts:["To identify a device's physical network interface at Layer 2","To route traffic between different networks","To resolve domain names to IP addresses","To encrypt data in transit"],correct:0,exp:"A MAC address is a unique hardware identifier on a network interface card, used for communication within a local network segment at the Data Link layer."},
+{id:64,domain:4,text:"Which port is commonly associated with unencrypted HTTP web traffic?",opts:["22","25","80","443"],correct:2,exp:"Port 80 is the standard port for HTTP traffic, while port 443 is used for encrypted HTTPS traffic."},
+{id:65,domain:4,text:"Which port is commonly used for SSH remote administration?",opts:["21","22","23","3389"],correct:1,exp:"Port 22 is the standard port for SSH, which provides encrypted remote command-line access, unlike Telnet on port 23 which is unencrypted."},
+{id:66,domain:4,text:"What is the primary function of DNS?",opts:["Assigning IP addresses to devices automatically","Translating human-readable domain names into IP addresses","Encrypting network traffic","Filtering malicious traffic"],correct:1,exp:"DNS resolves domain names, such as example.com, into the numeric IP addresses that computers use to locate and communicate with each other."},
+{id:67,domain:4,text:"What is the primary function of DHCP?",opts:["Automatically assigning IP addresses and network configuration to devices","Translating domain names to IP addresses","Encrypting wireless traffic","Filtering inbound firewall traffic"],correct:0,exp:"DHCP automatically assigns IP addresses, subnet masks, gateways, and other configuration details to devices joining a network, removing the need for manual setup."},
+{id:68,domain:4,text:"What is the main purpose of a firewall?",opts:["To physically secure network cabling","To monitor and control incoming and outgoing network traffic based on defined security rules","To automatically patch software vulnerabilities","To provide wireless connectivity"],correct:1,exp:"A firewall enforces a rule set that permits or blocks traffic between network segments based on criteria such as IP address, port, and protocol."},
+{id:69,domain:4,text:"What is the key difference between an IDS and an IPS?",opts:["An IDS actively blocks malicious traffic; an IPS only alerts","An IDS only monitors and alerts on suspicious activity; an IPS can actively block or prevent it","They are identical in function","An IDS works only on wireless networks"],correct:1,exp:"An IDS passively monitors traffic and generates alerts for suspicious activity, while an IPS sits inline and can actively block or drop malicious traffic in real time."},
+{id:70,domain:4,text:"What is the primary purpose of a VPN?",opts:["To physically isolate a network segment","To create an encrypted tunnel for secure communication over an untrusted network such as the internet","To assign static IP addresses","To speed up DNS resolution"],correct:1,exp:"A VPN encrypts traffic between endpoints, allowing secure, private communication across a public or untrusted network like the internet."},
+{id:71,domain:4,text:"Why would an organization implement VLANs?",opts:["To physically separate cabling by color","To logically segment a network into separate broadcast domains without needing separate physical hardware","To increase wireless signal strength","To eliminate the need for firewalls entirely"],correct:1,exp:"VLANs logically divide a single physical network into multiple isolated broadcast domains, improving security through segmentation and reducing unnecessary broadcast traffic without extra physical switches."},
+{id:72,domain:4,text:"Which wireless security protocol is currently considered the most secure and recommended standard?",opts:["WEP","WPA","WPA2","WPA3"],correct:3,exp:"WPA3 is the newest and most secure Wi-Fi security protocol, offering stronger encryption and better protection against offline password-guessing attacks than WEP, WPA, or WPA2."},
+{id:73,domain:4,text:"Why is WEP considered insecure by modern standards?",opts:["It uses no encryption at all","It uses weak encryption and a flawed key management scheme that can be cracked relatively quickly","It only works on wired networks","It requires biometric authentication"],correct:1,exp:"WEP relies on a weak implementation of the RC4 cipher and static keys, which have well-documented vulnerabilities that let attackers crack the encryption quickly."},
+{id:74,domain:4,text:"What best describes a Distributed Denial of Service (DDoS) attack?",opts:["A single attacker slowly guessing passwords over time","Overwhelming a target with traffic from multiple sources to disrupt availability","Intercepting and reading encrypted communications","Modifying DNS records to redirect traffic"],correct:1,exp:"A DDoS attack floods a target with traffic from many distributed, often compromised, sources to exhaust its resources and deny service to legitimate users."},
+{id:75,domain:4,text:"In a Man-in-the-Middle attack, what does the attacker primarily do?",opts:["Physically damage network hardware","Secretly intercept and potentially alter communications between two parties who believe they are communicating directly","Flood a server with excessive requests","Guess a user's password through repeated attempts"],correct:1,exp:"A MITM attack positions the attacker between two communicating parties, allowing eavesdropping on or manipulation of traffic without either party being aware."},
+{id:76,domain:4,text:"What is ARP spoofing used to accomplish?",opts:["Encrypting network traffic","Associating an attacker's MAC address with a legitimate IP address on a local network to intercept traffic","Registering a fraudulent domain name","Bypassing multi-factor authentication"],correct:1,exp:"ARP spoofing sends falsified ARP messages to associate the attacker's MAC address with a legitimate device's IP address, redirecting that device's traffic to the attacker."},
+{id:77,domain:4,text:"What is the security purpose of a DMZ in network architecture?",opts:["To store encryption keys","To host public-facing services in a segmented zone, isolating them from the internal trusted network","To provide a backup power source","To physically secure server racks"],correct:1,exp:"A DMZ is a buffer segment hosting externally accessible services, keeping them isolated from the internal network so a compromise of a public-facing service does not directly expose internal systems."},
+{id:78,domain:4,text:"What is the primary function of NAT?",opts:["Translating domain names into IP addresses","Allowing multiple devices on a private network to share a single public IP address for internet access","Encrypting traffic between two VPN endpoints","Assigning MAC addresses to new devices"],correct:1,exp:"NAT translates private internal IP addresses to a public address and back, letting multiple internal devices share one public-facing address while hiding internal addressing."},
+{id:79,domain:4,text:"What is a primary security benefit of network segmentation?",opts:["It eliminates the need for authentication","It limits how far an attacker can move within a network if one segment is compromised","It guarantees 100% uptime","It removes the need for encryption"],correct:1,exp:"Segmentation divides a network into smaller isolated zones, containing the impact of a breach and limiting an attacker's ability to move laterally to other critical systems."},
+{id:80,domain:4,text:"In the cloud service model spectrum, which model gives the customer the least infrastructure management responsibility?",opts:["IaaS","PaaS","SaaS","On-premises hosting"],correct:2,exp:"In SaaS, the provider manages the entire stack including the application itself, and the customer simply uses the software, unlike IaaS or PaaS where the customer manages more of the underlying infrastructure."},
+{id:81,domain:4,text:"In the cloud service model spectrum, which model gives the customer the most control over operating system and infrastructure configuration?",opts:["SaaS","PaaS","IaaS","FaaS"],correct:2,exp:"IaaS provides virtualized computing resources such as servers, storage, and networking, leaving the customer responsible for managing the operating system, applications, and configuration."},
+{id:82,domain:4,text:"What is the main function of a proxy server in a network?",opts:["To assign IP addresses dynamically","To act as an intermediary between clients and other servers, filtering content, caching data, and masking client identity","To physically secure a server room","To provide biometric authentication"],correct:1,exp:"A proxy server sits between clients and a destination server, forwarding requests on the client's behalf, which allows content filtering, caching, and hiding the client's real IP address."},
+{id:83,domain:5,text:"What are the three states in which data can exist, relevant to applying appropriate security controls?",opts:["Encrypted, decrypted, hashed","Data at rest, data in transit, data in use","Public, private, confidential","Structured, unstructured, semi-structured"],correct:1,exp:"Data at rest, meaning stored data, data in transit, meaning data moving across a network, and data in use, meaning data actively being processed, each require tailored security controls."},
+{id:84,domain:5,text:"Which type of protection is most appropriate for data as it travels across a network, such as during a web transaction?",opts:["Encryption for data at rest only","Encryption for data in transit, such as TLS","No protection is needed for network traffic","Only physical security controls apply"],correct:1,exp:"Protocols such as TLS encrypt data in transit, protecting it from interception as it moves across networks like the internet."},
+{id:85,domain:5,text:"What is the purpose of data classification in an organization?",opts:["To determine server rack placement","To categorize data based on sensitivity so appropriate handling and protection controls can be applied","To assign IP addresses to data servers","To calculate the ARO for risk assessments"],correct:1,exp:"Data classification, such as public, internal, confidential, and restricted, helps an organization apply proportionate security controls and handling procedures based on how sensitive the data is."},
+{id:86,domain:5,text:"What does system hardening refer to?",opts:["Increasing the physical weight of server hardware","Reducing a system's attack surface by disabling unnecessary services, closing unused ports, and applying secure configurations","Adding more RAM to improve performance","Training employees on phishing awareness"],correct:1,exp:"Hardening reduces potential vulnerabilities by removing or disabling unnecessary software, services, accounts, and ports, and applying secure configuration baselines."},
+{id:87,domain:5,text:"Why is timely patch management considered a critical security operations practice?",opts:["It improves the visual design of software","It closes known vulnerabilities in software before attackers can exploit them","It eliminates the need for firewalls","It automatically classifies data"],correct:1,exp:"Patches often fix known security vulnerabilities, and delaying their application leaves systems exposed to exploits that target those already-disclosed weaknesses."},
+{id:88,domain:5,text:"What is a configuration baseline in the context of system hardening?",opts:["A random configuration applied to test systems","A documented, standardized secure configuration that serves as a reference point for a system","A backup schedule","A physical inventory of hardware assets"],correct:1,exp:"A configuration baseline defines the approved, secure settings a system should have, providing a reference for detecting unauthorized changes and ensuring consistency across similar systems."},
+{id:89,domain:5,text:"What is the primary purpose of a formal change management process?",opts:["To allow any employee to modify production systems at any time without approval","To ensure changes to systems are reviewed, approved, tested, and documented to minimize unintended impact","To eliminate the need for backups","To replace the incident response process"],correct:1,exp:"Change management ensures modifications to IT systems go through a controlled process of review and approval, reducing the risk of outages or security gaps caused by uncoordinated changes."},
+{id:90,domain:5,text:"What is the main purpose of a SIEM system?",opts:["To physically secure server rooms","To aggregate, correlate, and analyze log data from multiple sources to detect and alert on security events","To assign user roles and permissions","To encrypt data at rest"],correct:1,exp:"A SIEM centralizes log and event data across an organization's systems, applying correlation rules and analytics to detect suspicious patterns and generate alerts."},
+{id:91,domain:5,text:"Why is centralized logging and monitoring important in security operations?",opts:["It removes the need for access controls","It enables detection of suspicious activity, supports investigations, and provides an audit trail across systems","It automatically prevents all attacks","It replaces the need for antivirus software"],correct:1,exp:"Centralized logs provide visibility across the environment, allowing teams to detect anomalies, investigate incidents, and demonstrate compliance through a reliable audit trail."},
+{id:92,domain:5,text:"What is the primary goal of security awareness training for general employees?",opts:["To teach employees to write secure code","To help employees recognize and appropriately respond to threats such as phishing and social engineering","To train employees to configure firewalls","To certify employees as penetration testers"],correct:1,exp:"Security awareness training targets the general workforce, focusing on recognizing common threats like phishing and social engineering, since employees are often the first line of defense."},
+{id:93,domain:5,text:"An attacker calls an employee pretending to be from IT support and convinces them to reveal their password. What social engineering technique is this?",opts:["Tailgating","Pretexting","Baiting","Shoulder surfing"],correct:1,exp:"Pretexting involves creating a fabricated scenario or false identity to manipulate a victim into divulging information, as opposed to baiting, which offers something enticing, or shoulder surfing, which is visual observation."},
+{id:94,domain:5,text:"An attacker leaves an infected USB drive labeled Payroll 2026 in a company parking lot, hoping an employee will plug it in. What social engineering technique is this?",opts:["Phishing","Baiting","Pretexting","Tailgating"],correct:1,exp:"Baiting lures a victim into an action, such as plugging in a malicious USB drive, by offering something appealing or curiosity-inducing."},
+{id:95,domain:5,text:"What is the primary purpose of an Acceptable Use Policy (AUP)?",opts:["To define acceptable salary ranges","To outline the rules and expected behavior for employees using organizational IT systems and resources","To specify data backup schedules","To describe the encryption algorithm used company-wide"],correct:1,exp:"An AUP sets clear expectations for how employees may appropriately use company systems, networks, and devices, helping reduce misuse and legal or security risk."},
+{id:96,domain:5,text:"What is the main goal of a vulnerability management program?",opts:["To eliminate all risk permanently","To continuously identify, assess, prioritize, and remediate security weaknesses in systems","To replace the need for incident response","To manage employee vacation schedules"],correct:1,exp:"Vulnerability management is an ongoing cycle of scanning for weaknesses, assessing severity, prioritizing remediation, and verifying fixes, since eliminating all risk is not realistically achievable."},
+{id:97,domain:5,text:"What is the primary function of antivirus and anti-malware software?",opts:["To encrypt all outbound traffic","To detect, prevent, and remove malicious software from a system","To manage user access permissions","To perform network segmentation"],correct:1,exp:"Antivirus and anti-malware tools scan for, block, and remove known and suspicious malicious software based on signatures, heuristics, or behavioral analysis."},
+{id:98,domain:5,text:"What is the key difference between symmetric and asymmetric encryption?",opts:["Symmetric uses one shared key for both encryption and decryption; asymmetric uses a mathematically linked public and private key pair","Symmetric is always more secure than asymmetric","Asymmetric encryption requires no keys at all","They are functionally identical"],correct:0,exp:"Symmetric encryption uses the same secret key for both encrypting and decrypting, while asymmetric encryption uses a public key to encrypt and a mathematically related private key to decrypt, avoiding the need to share a secret key."},
+{id:99,domain:5,text:"What is the primary purpose of hashing, as distinct from encryption?",opts:["To make data unreadable and later reversible with a key","To produce a fixed-length, one-way digest of data used to verify integrity, without being intended to be reversed","To compress large files for storage","To assign IP addresses"],correct:1,exp:"Hashing creates a fixed-size, unique digest of data that is not meant to be reversed, primarily used to verify data has not been altered, unlike encryption, which is designed to be decrypted."},
+{id:100,domain:5,text:"What role does a Certificate Authority (CA) play in a Public Key Infrastructure (PKI)?",opts:["It stores backup copies of all company data","It issues and vouches for the validity of digital certificates that bind public keys to verified identities","It manages employee physical access badges","It performs network traffic filtering"],correct:1,exp:"A Certificate Authority is a trusted entity that issues digital certificates, verifying a public key belongs to the identified entity, which underpins trust in systems like HTTPS."},
+{id:201,domain:1,text:"Which statement best describes a threat actor?",opts:["A software patch that fixes a vulnerability","An individual or group that attempts to exploit a weakness for gain or disruption","A backup repository used after a disaster","A type of security policy"],correct:1,exp:"A threat actor is an entity, whether human or otherwise, that may exploit a vulnerability to cause harm or gain unauthorized advantage."},
+{id:202,domain:1,text:"Which of the following is the best example of a vulnerability?",opts:["A phishing email sent to an employee","An unpatched web server that is exposed to the internet","A malware infection already in progress","A business process that requires approval"],correct:1,exp:"A vulnerability is a weakness or flaw that can be exploited. An unpatched exposed server is a classic example of a vulnerability."},
+{id:103,domain:1,text:"A company wants to reduce the chance that a single employee can fraudulently approve and process a payment. Which principle is most directly addressed?",opts:["Least privilege","Separation of duties","Defense in depth","Due diligence"],correct:1,exp:"Separation of duties splits sensitive tasks across multiple people, reducing the risk that one user can misuse a process for fraud or error."},
+{id:104,domain:1,text:"Which of the following is the best example of a preventive control?",opts:["An alert generated after a login failure spike","A backup restored after a ransomware attack","A firewall blocking suspicious inbound traffic","A post-incident report"],correct:2,exp:"Preventive controls aim to stop an incident from occurring. Blocking suspicious traffic before it enters the network is a preventive control."},
+{id:105,domain:1,text:"What is the primary purpose of a policy in information security governance?",opts:["To define specific technical configuration settings","To provide high-level management direction and intent","To provide step-by-step implementation guidance","To replace the need for standards"],correct:1,exp:"Policies set organizational intent and direction. Standards and guidelines provide more specific implementation details."},
+{id:106,domain:1,text:"A security team wants to ensure that users can access only the systems and data required for their role. Which concept does this best support?",opts:["Availability","Least privilege","Integrity","Non-repudiation"],correct:1,exp:"Least privilege ensures that users receive only the minimum access necessary to perform their jobs, reducing exposure and impact."},
+{id:107,domain:1,text:"If an organization determines that a risk is too costly to mitigate and chooses to continue operating without additional controls, which treatment is being used?",opts:["Risk acceptance","Risk transfer","Risk avoidance","Risk mitigation"],correct:0,exp:"Risk acceptance means the organization knowingly decides to accept the risk because the cost or effort to reduce it is not justified."},
+{id:108,domain:1,text:"A company implements both strong passwords and MFA. This is an example of which security principle?",opts:["Single point of failure","Defense in depth","Risk transfer","Availability"],correct:1,exp:"Defense in depth uses multiple layers of controls so that one control failing does not leave the system fully exposed."},
+{id:109,domain:1,text:"Which of the following best describes due care?",opts:["Performing a formal risk analysis after an incident","Taking reasonable, responsible actions to protect assets and comply with obligations","Granting access based on job title only","Ignoring low-severity vulnerabilities"],correct:1,exp:"Due care is the ongoing, reasonable effort an organization makes to act responsibly in protecting assets and meeting its obligations."},
+{id:110,domain:1,text:"Which of the following is a common example of a deterrent control?",opts:["An alarm system that notifies responders","Visible security cameras","A backup restoration process","A firewall rule set"],correct:1,exp:"Deterrent controls discourage misuse by making it clear that monitoring or consequences exist. Visible security cameras are a common deterrent."},
+{id:111,domain:1,text:"If a system owner wants to ensure that data remains unchanged during storage and transmission, which CIA principle is most relevant?",opts:["Availability","Integrity","Confidentiality","Authorization"],correct:1,exp:"Integrity focuses on maintaining the accuracy and trustworthiness of data and preventing unauthorized modification."},
+{id:112,domain:1,text:"What is the main purpose of an acceptable use policy?",opts:["To define required software versions","To describe how users should properly use company systems and resources","To assign network addresses","To determine data backup schedules"],correct:1,exp:"An acceptable use policy sets expectations for how employees may use organizational systems and resources in a safe and proper manner."},
+{id:113,domain:1,text:"Which of the following best describes a compensating control?",opts:["A control that replaces a missing or impractical primary control with an alternative safeguard","A control that only detects incidents after the fact","A control that physically blocks entry to a building","A control that transfers all risk to an insurer"],correct:0,exp:"Compensating controls provide an alternative means of reducing risk when the preferred control cannot be implemented directly."},
+{id:114,domain:1,text:"What is the primary purpose of a security awareness program?",opts:["To eliminate all cybersecurity incidents","To educate users about common threats and safe behaviors","To replace the need for technical controls","To create legal liability for users"],correct:1,exp:"Security awareness programs help users understand and avoid common threats such as phishing and social engineering."},
+{id:115,domain:1,text:"An organization wants to ensure that employees cannot both create and approve a vendor payment. Which principle is this targeting?",opts:["Need to know","Separation of duties","Least privilege","Risk acceptance"],correct:1,exp:"Separation of duties prevents a single person from controlling all parts of a sensitive process and is meant to reduce fraud and error."},
+{id:116,domain:1,text:"Which of the following is the best example of an administrative control?",opts:["A locked server room","A password policy","A firewall","A surveillance camera"],correct:1,exp:"Administrative controls are policy- or process-based, such as a password policy that governs user behavior."},
+{id:117,domain:1,text:"Which incident outcome is most closely associated with a loss of confidentiality?",opts:["A system is unavailable to users","Sensitive data is exposed to unauthorized individuals","A file is altered without authorization","A server crashes"],correct:1,exp:"Confidentiality involves protecting data from unauthorized disclosure, so exposure of sensitive data is a confidentiality loss."},
+{id:118,domain:1,text:"Which of the following is typically considered a qualitative risk assessment approach?",opts:["Calculating exact annual loss expectancy","Assigning high, medium, and low ratings","Using a detailed spreadsheet model","Measuring the value of every asset in dollars"],correct:1,exp:"Qualitative assessments use descriptive ratings such as low, medium, and high rather than precise numerical values."},
+{id:119,domain:1,text:"A company uses a digital signature to prove that a document came from a specific sender. This is mainly an example of which principle?",opts:["Availability","Integrity","Non-repudiation","Confidentiality"],correct:2,exp:"Non-repudiation helps prove who performed or initiated an action so that they cannot later deny it."},
+{id:120,domain:1,text:"Which of the following best describes the concept of risk?",opts:["The cost of buying security tools","The chance that a threat will exploit a vulnerability and cause impact","The number of controls in place","The amount of data stored by an organization"],correct:1,exp:"Risk is the potential for harm when a threat exploits a vulnerability and affects an asset or process."},
+{id:121,domain:2,text:"What is the purpose of a tabletop exercise?",opts:["To physically rebuild a data center","To test incident response plans through discussion and simulation","To install new firewalls","To create new user accounts"],correct:1,exp:"A tabletop exercise is a discussion-based simulation used to evaluate preparedness and identify gaps in plans."},
+{id:122,domain:2,text:"Which recovery method restores data from a backup to a previous point in time?",opts:["Failover","Restore","Containment","Eradication"],correct:1,exp:"Restoration is the process of bringing data or systems back from backup media or replicas to an operational state."},
+{id:123,domain:2,text:"What is the main difference between a warm site and a cold site?",opts:["A warm site is fully staffed while a cold site is not","A warm site is partially equipped and can be brought online faster than a cold site","A warm site is only cloud-based","A cold site is always active and synchronized"],correct:1,exp:"A warm site usually has some infrastructure and data already in place, allowing quicker activation than a cold site."},
+{id:124,domain:2,text:"Which term describes the maximum acceptable length of time a business process can be down before causing unacceptable harm?",opts:["RPO","RTO","SLE","ALE"],correct:1,exp:"RTO is the recovery time objective, representing the maximum allowable downtime for a business function or system."},
+{id:125,domain:2,text:"Which term describes the maximum acceptable amount of data loss measured in time?",opts:["RPO","RTO","MTD","BCP"],correct:0,exp:"RPO is the recovery point objective, the maximum acceptable amount of data loss in terms of time since the last backup or recovery point."},
+{id:126,domain:2,text:"What is the primary goal of continuity planning?",opts:["To make all systems identical","To ensure critical business functions continue during and after a disruption","To delete all backups after testing","To replace the risk register"],correct:1,exp:"Continuity planning is about maintaining or recovering essential business operations during and after disruptions."},
+{id:127,domain:2,text:"Which of the following is typically the first phase of an incident response process?",opts:["Recovery","Preparation","Lessons learned","Containment"],correct:1,exp:"Preparation is the foundational phase where policies, procedures, training, and tooling are established before an incident occurs."},
+{id:128,domain:2,text:"During an incident, which action best demonstrates containment?",opts:["Deleting the affected files","Isolating the infected host from the network","Documenting the incident after the fact","Restoring all systems immediately"],correct:1,exp:"Containment limits damage by preventing the threat from spreading further, such as by isolating an infected system."},
+{id:129,domain:2,text:"What is the benefit of testing disaster recovery plans periodically?",opts:["It removes the need for backups","It helps uncover weaknesses and ensures the plan works when needed","It automatically resolves all incidents","It prevents incidents from ever happening"],correct:1,exp:"Regular testing helps identify gaps, outdated assumptions, and procedural issues before a real disaster occurs."},
+{id:130,domain:2,text:"Which backup strategy copies only data changed since the last backup of any type?",opts:["Full backup","Differential backup","Incremental backup","Synthetic backup"],correct:2,exp:"Incremental backups capture only changes since the last backup of any type, which makes them efficient but less straightforward to restore."},
+{id:131,domain:2,text:"If an organization has a very low tolerance for data loss, which recovery objective is likely to be strict?",opts:["RTO","RPO","MTD","SLE"],correct:1,exp:"A low tolerance for data loss means the recovery point objective is stringent because backups and recovery points must be frequent."},
+{id:132,domain:2,text:"What is the purpose of a Business Impact Analysis?",opts:["To select encryption algorithms","To identify critical functions and the impact of downtime","To choose passwords for users","To define firewall rules"],correct:1,exp:"A BIA helps an organization prioritize recovery needs by identifying critical business processes and the consequences of disruption."},
+{id:133,domain:2,text:"A company wants to ensure it can continue operations if a primary facility becomes unavailable. Which concept is this most directly related to?",opts:["Incident triage","Availability and resilience","Data classification","Least privilege"],correct:1,exp:"Resilience and continuity planning focus on sustaining operations despite facility or service disruptions."},
+{id:134,domain:2,text:"What is the main purpose of an incident communication plan?",opts:["To prevent all incidents","To ensure the right people receive timely and accurate information during an incident","To replace technical evidence collection","To archive old backups"],correct:1,exp:"Communication plans guide who needs to be informed, how, and when during an incident, which is critical to coordinated response."},
+{id:135,domain:2,text:"Which of the following is an example of a corrective control?",opts:["A firewall rule that blocks suspicious traffic","A backup restoration after a ransomware attack","A visible security camera","A password complexity policy"],correct:1,exp:"Corrective controls restore systems or reduce the impact after an incident has already happened, such as recovery from backup."},
+{id:136,domain:2,text:"Why is documentation important in incident response?",opts:["It prevents any form of recovery","It supports accountability, evidence, and future improvement","It eliminates the need for training","It replaces monitoring tools"],correct:1,exp:"Good documentation preserves evidence, supports investigations, and provides a basis for lessons learned and process improvement."},
+{id:137,domain:2,text:"Which term refers to the point when the organization realizes an incident is occurring?",opts:["Containment","Detection","Recovery","Escalation"],correct:1,exp:"Detection is the phase where suspicious or confirmed activity is identified as an incident requiring response."},
+{id:138,domain:2,text:"Which of the following is commonly part of a disaster recovery plan?",opts:["A list of approved employee lunches","A step-by-step procedure for restoring systems and data","A marketing campaign schedule","A list of public holidays"],correct:1,exp:"A DRP typically covers the procedures, responsibilities, and priorities needed to recover systems, applications, and data after a disaster."},
+{id:139,domain:2,text:"What is the main purpose of a failover mechanism?",opts:["To block all network traffic","To automatically switch operations to a backup system or site","To delete logs after a breach","To create new user accounts"],correct:1,exp:"Failover allows an organization to continue operations by automatically or manually switching to backup systems or sites when primary systems are unavailable."},
+{id:140,domain:2,text:"Which of the following best describes a hot site?",opts:["A facility with basic space and power but no systems ready","A fully equipped and nearly current backup site that can take over quickly","A temporary file storage area","A single-user workstation"],correct:1,exp:"A hot site is a fully operational or nearly fully operational alternate site intended for rapid recovery."},
+{id:141,domain:3,text:"Which factor category does a PIN belong to?",opts:["Something you are","Something you know","Something you have","Somewhere you are"],correct:1,exp:"A PIN is something the user knows, which is one of the common authentication factor categories."},
+{id:142,domain:3,text:"What is the main benefit of MFA over a password-only approach?",opts:["It requires no user management","It increases the difficulty of compromise by requiring multiple factors","It removes the need for authorization","It makes all systems open to everyone"],correct:1,exp:"MFA adds additional layers of identity verification, making unauthorized access significantly harder even if one factor is compromised."},
+{id:143,domain:3,text:"Which access control model is typically based on labels such as confidential or top secret?",opts:["DAC","MAC","RBAC","ABAC"],correct:1,exp:"Mandatory Access Control relies on fixed security labels and clearance levels established by a governing authority."},
+{id:144,domain:3,text:"Which access control model is built around attributes such as department, role, time, and location?",opts:["DAC","MAC","RBAC","ABAC"],correct:3,exp:"Attribute-Based Access Control makes decisions based on a combination of dynamic or contextual attributes rather than only a single role."},
+{id:145,domain:3,text:"Why is timely account provisioning important?",opts:["It ensures employees have access immediately even without approval","It provides users the access they need when they join or change roles while keeping control over privileges","It removes the need to monitor accounts","It reduces the amount of logging"],correct:1,exp:"Provisioning ensures new users receive the correct access at the right time and that access is granted based on approved needs."},
+{id:146,domain:3,text:"What is the purpose of a password policy that requires periodic changes?",opts:["To increase the chance of password reuse","To reduce the risk of long-term compromise of a password","To replace the need for MFA","To make all passwords identical"],correct:1,exp:"Periodic password changes can reduce the window of exposure if a password becomes compromised, though policies must balance usability and security."},
+{id:147,domain:3,text:"What is the best description of a privileged account?",opts:["An account used only for email access","An account with elevated rights such as administrator or root privileges","An account that cannot be locked out","An account with no password"],correct:1,exp:"Privileged accounts have extra permissions that allow significant configuration changes or access to sensitive systems, making them high value targets."},
+{id:148,domain:3,text:"Which practice helps reduce the risk of users retaining access after changing roles or leaving the company?",opts:["Password reuse","Regular access reviews and deprovisioning","Turning off logging","Sharing admin credentials"],correct:1,exp:"Access reviews and prompt deprovisioning ensure that permissions remain appropriate and that departed or reassigned users lose access quickly."},
+{id:149,domain:3,text:"What is the main goal of privileged access management?",opts:["To allow everyone to use administrator accounts","To secure, monitor, and control high-privilege access","To make passwords longer only","To bypass multifactor authentication"],correct:1,exp:"PAM focuses on controlling and monitoring privileged access because those accounts pose the greatest risk if compromised."},
+{id:150,domain:3,text:"Which statement about biometrics is most accurate?",opts:["Biometrics are always foolproof","Biometrics can be convenient but may still produce false acceptances or rejections","Biometrics are not considered a factor","Biometrics are only used for physical access"],correct:1,exp:"Biometrics are useful authentication factors, but they are not perfect and can still produce both false acceptances and false rejections."},
+{id:151,domain:3,text:"A system allows user A to read a file only if the file's classification is equal to or lower than the user’s clearance. Which model is this most likely to be?",opts:["DAC","RBAC","MAC","ABAC"],correct:2,exp:"Mandatory Access Control uses clearance and classification labels to determine whether a user can access a resource."},
+{id:152,domain:3,text:"What is the primary purpose of a mantrap?",opts:["To encrypt documents","To control physical entry by limiting passage through a secured area","To monitor network traffic","To provide backup power"],correct:1,exp:"A mantrap uses interlocking doors to control and verify individuals entering a secured area, reducing tailgating and unauthorized entry."},
+{id:153,domain:3,text:"A user who is not permitted to see certain information is still able to access it because of a weak system rule. This is an example of what type of problem?",opts:["Availability","Integrity","Access control failure","Hashing issue"],correct:2,exp:"An access control failure occurs when access decisions do not properly enforce the intended permissions and restrictions."},
+{id:154,domain:3,text:"Why might an organization use role-based access control instead of assigning permissions individually?",opts:["It ensures every user gets all permissions","It simplifies administration by assigning permissions to roles","It eliminates all security risks","It removes the need to review permissions"],correct:1,exp:"RBAC reduces administrative overhead by grouping users into roles with predefined access rights, simplifying management and improving consistency."},
+{id:155,domain:3,text:"Which statement best describes the concept of need to know?",opts:["Users should know all company passwords","A user should have access only to information necessary for their job","Only administrators need to know anything about security","Anyone can view all confidential data if they are on the network"],correct:1,exp:"Need to know limits access to the minimum information necessary for someone to perform their duties, even if they are authorized more broadly."},
+{id:156,domain:3,text:"Which authentication factor is a smart card?",opts:["Something you know","Something you have","Something you are","Somewhere you are"],correct:1,exp:"A smart card is a physical token, so it is categorized as something you have."},
+{id:157,domain:3,text:"What is the purpose of an access review?",opts:["To increase password length","To verify that user permissions remain appropriate over time","To replace encryption","To create backup copies"],correct:1,exp:"Access reviews help ensure that users still need the permissions they have and that unnecessary or stale access is removed."},
+{id:158,domain:3,text:"If an attacker obtains a password but cannot access a second account without a second factor, which control is helping?",opts:["Single sign-on","MFA","Encryption","Compression"],correct:1,exp:"MFA increases security by requiring additional verification beyond just a password, so a stolen password alone may not be enough."},
+{id:159,domain:3,text:"What is a common security reason for disabling accounts rather than deleting them immediately?",opts:["Deleted accounts are easier to recover","Disabled accounts preserve audit history and prevent immediate access while preserving the identity for later review","Deleted accounts are more secure by default","Disabled accounts reduce the need for logging"],correct:1,exp:"Disabling an account can be a controlled way to remove access while preserving the account object for audit, recovery, or later reactivation if appropriate."},
+{id:160,domain:3,text:"What is the main advantage of federation in identity management?",opts:["It removes all need for passwords","It allows trust and authentication to be shared across separate systems or organizations","It prevents all phishing attacks","It makes every system use the same password"],correct:1,exp:"Federation lets one trusted identity provider authenticate users for multiple systems, simplifying access while preserving trust relationships."},
+{id:161,domain:4,text:"Which protocol is used to securely encrypt web traffic between a browser and a server?",opts:["FTP","HTTP","HTTPS","SMTP"],correct:2,exp:"HTTPS uses TLS to provide encrypted communication between a client and a server, protecting data in transit."},
+{id:162,domain:4,text:"What is the principal role of a switch at Layer 2?",opts:["To route packets between different networks","To forward frames within the same local network using MAC addresses","To translate domains to IP addresses","To assign IP addresses automatically"],correct:1,exp:"Switches operate at Layer 2 and use MAC addresses to forward traffic within a local broadcast domain."},
+{id:163,domain:4,text:"Which network device is most likely to be used to filter traffic based on IP address and port number?",opts:["Hub","Switch","Firewall","Repeater"],correct:2,exp:"Firewalls inspect traffic and enforce rules based on characteristics like IP addresses, ports, protocols, and application behavior."},
+{id:164,domain:4,text:"What does a proxy server commonly do for clients?",opts:["It replaces the need for authentication","It acts as an intermediary and can provide filtering, caching, and anonymity","It physically prevents cable theft","It stores all user passwords"],correct:1,exp:"A proxy server mediates requests between clients and other servers, often adding filtering, caching, logging, or privacy benefits."},
+{id:165,domain:4,text:"Which protocol is commonly used to send email?",opts:["DNS","HTTP","SMTP","DHCP"],correct:2,exp:"SMTP is the standard protocol used for sending email messages between mail servers and clients."},
+{id:166,domain:4,text:"What is the purpose of a DMZ?",opts:["To provide a secure backup storage zone","To host public-facing services separately from the internal network","To store encrypted keys only","To replace firewalls"],correct:1,exp:"A DMZ provides a segmented zone for public-facing services so they can be isolated from the internal trusted network."},
+{id:167,domain:4,text:"What does a VPN create?",opts:["A direct physical cable between locations","An encrypted tunnel over an untrusted network","A new DNS domain","A wireless access point"],correct:1,exp:"A VPN uses tunneling and encryption to allow secure communication over untrusted networks such as the internet."},
+{id:168,domain:4,text:"Why are VLANs commonly used?",opts:["To encrypt traffic automatically","To logically separate network traffic into different segments","To replace the need for routers","To provide power to devices"],correct:1,exp:"VLANs divide a physical network into logical segments, improving security and reducing unnecessary traffic exposure."},
+{id:169,domain:4,text:"Which of the following is the most secure wireless security protocol?",opts:["WEP","WPA","WPA2","WPA3"],correct:3,exp:"WPA3 is the most recent and generally recommended Wi-Fi security standard, offering stronger protections than older options."},
+{id:170,domain:4,text:"What is a common characteristic of a DDoS attack?",opts:["It uses only one source to attack a system","It floods a target with traffic from many sources to disrupt availability","It only targets physical servers","It uses static IP addresses only"],correct:1,exp:"DDoS attacks overwhelm targets with traffic from many distributed sources, causing service disruption or outage."},
+{id:171,domain:4,text:"What is the main purpose of network segmentation?",opts:["To increase broadcast traffic","To limit lateral movement and contain the spread of compromise","To eliminate the need for access control","To replace encryption"],correct:1,exp:"Segmentation creates smaller network zones, which limits the impact of a compromise and reduces an attacker’s ability to move laterally."},
+{id:172,domain:4,text:"What does NAT commonly allow in a home or business network?",opts:["Multiple devices to share one public IP address","All devices to use the same MAC address","The network to bypass DNS","Traffic to be blocked automatically"],correct:0,exp:"Network Address Translation lets multiple internal devices share one or a small number of public IP addresses."},
+{id:173,domain:4,text:"Which layer of the OSI model is responsible for end-to-end delivery and reliability?",opts:["Layer 3","Layer 4","Layer 5","Layer 7"],correct:1,exp:"Layer 4, the Transport layer, is responsible for end-to-end communication, reliability, and flow control for many protocols such as TCP and UDP."},
+{id:174,domain:4,text:"What type of attack intercepts traffic between two parties without their awareness?",opts:["Brute-force attack","Man-in-the-middle attack","Dictionary attack","Phishing attack"],correct:1,exp:"A man-in-the-middle attack secretly intercepts or alters communications between two parties without either one realizing it."},
+{id:175,domain:4,text:"Which protocol is used to resolve hostnames to IP addresses?",opts:["DHCP","DNS","ARP","ICMP"],correct:1,exp:"DNS resolves domain names into IP addresses that computers use to reach services and hosts."},
+{id:176,domain:4,text:"Why is port scanning a useful security technique?",opts:["It makes every port open","It helps identify which services and ports are exposed and potentially vulnerable","It automatically patches systems","It replaces firewalls"],correct:1,exp:"Port scanning is often used to discover which services are listening and where openings may exist that need to be secured."},
+{id:177,domain:4,text:"What is a common purpose of an IDS?",opts:["To block all traffic by default","To monitor traffic and generate alerts about suspicious activity","To provide DHCP leases","To physically secure a server room"],correct:1,exp:"An intrusion detection system monitors network or host activity and raises alerts when suspicious behavior is observed."},
+{id:178,domain:4,text:"Which form of attack tries to guess passwords by trying many common combinations?",opts:["Phishing","Brute-force attack","Tailgating","Spoofing"],correct:1,exp:"A brute-force attack repeatedly tries candidate passwords until one succeeds or the attempt is blocked."},
+{id:179,domain:4,text:"What is the purpose of a wireless access point’s SSID?",opts:["To identify the network name broadcast to clients","To provide an IP address","To encrypt all data","To authenticate users physically"],correct:0,exp:"The SSID is the network name that clients see and can connect to, though it should not be the only security control."},
+{id:180,domain:4,text:"Which of the following best describes a bastion host?",opts:["A host that is intentionally hardened and exposed to the internet to provide a controlled service","A backup server in the cloud","A user workstation with no security controls","A physical lock used on a server cabinet"],correct:0,exp:"A bastion host is a specially secured system exposed to potentially hostile networks to provide a controlled service such as remote access or a proxy."},
+{id:181,domain:5,text:"What is the primary function of encryption?",opts:["To create a permanent backup","To make data unreadable to unauthorized parties and reversible by authorized parties","To improve CPU speed","To monitor user behavior"],correct:1,exp:"Encryption transforms data into a form that cannot be read without the proper key, protecting it from unauthorized disclosure."},
+{id:182,domain:5,text:"Which statement best distinguishes hashing from encryption?",opts:["Hashing is reversible and encryption is not","Hashing creates a fixed-length digest that is not intended to be reversed, encryption is intended to be reversible","Hashing requires a private key and encryption does not","Hashing is only used for passwords"],correct:1,exp:"Hashing produces a one-way representation of data used for integrity and comparison, while encryption is designed to be reversed with the proper key."},
+{id:183,domain:5,text:"What is the purpose of data classification?",opts:["To assign hardware serial numbers","To identify the sensitivity of data so appropriate protection can be applied","To decide which users need laptops","To determine the number of backup tapes"],correct:1,exp:"Data classification helps organizations apply appropriate controls based on the sensitivity and value of the information."},
+{id:184,domain:5,text:"What is system hardening intended to achieve?",opts:["To increase system performance only","To reduce the attack surface by removing unnecessary services and locking down settings","To create more user accounts","To eliminate the need for logging"],correct:1,exp:"Hardening reduces the number of potential weaknesses in a system by disabling unnecessary features and applying secure settings."},
+{id:185,domain:5,text:"Why is patch management important?",opts:["It increases the number of installed applications","It closes known vulnerabilities and reduces the chance of exploitation","It reduces the need for physical security","It guarantees no user mistakes"],correct:1,exp:"Patch management applies updates that fix known security issues, which lowers exposure to known threats and vulnerabilities."},
+{id:186,domain:5,text:"What is the main purpose of a change management process?",opts:["To allow any user to change systems freely","To ensure changes are reviewed, approved, and documented before implementation","To replace antivirus tools","To prevent all downtime"],correct:1,exp:"Change management controls modifications so that changes are tested, approved, and documented, reducing risk to systems and services."},
+{id:187,domain:5,text:"What does a SIEM system primarily do?",opts:["It stores backup data only","It aggregates and analyzes logs from multiple systems to detect security events","It replaces endpoint protection","It physically secures the server room"],correct:1,exp:"A SIEM correlates logs and events from many sources so security teams can detect suspicious patterns and investigate incidents."},
+{id:188,domain:5,text:"What is a common purpose of endpoint detection and response tools?",opts:["To provide legal advice to staff","To detect, investigate, and respond to suspicious activity on endpoints","To replace cloud backups","To assign IP addresses"],correct:1,exp:"EDR solutions monitor endpoints for suspicious behavior and help security teams investigate and contain threats quickly."},
+{id:189,domain:5,text:"Which of the following is a common social engineering technique?",opts:["Phishing","ARP spoofing","Port scanning","Brute force"],correct:0,exp:"Phishing is a social engineering method that tricks people into revealing information or taking actions that compromise security."},
+{id:190,domain:5,text:"What is the best description of a security baseline?",opts:["A random set of settings","A documented minimum secure configuration for a system","A list of users who need access","A backup retention schedule"],correct:1,exp:"A baseline is the standardized secure configuration a system should follow, helping ensure consistent protection and easier auditing."},
+{id:191,domain:5,text:"What is the purpose of logging and monitoring?",opts:["To reduce storage capacity needs","To create an audit trail and help detect suspicious activity","To replace patching","To prevent user training"],correct:1,exp:"Logs and monitoring provide visibility into system and user activity, making suspicious behavior easier to detect and investigate."},
+{id:192,domain:5,text:"What is the objective of vulnerability scanning?",opts:["To create user passwords","To identify weaknesses that may need remediation","To replace antivirus software","To control access to the building"],correct:1,exp:"Vulnerability scanning helps find systems and software weaknesses that may need patching, configuration changes, or other remediation."},
+{id:193,domain:5,text:"Why is least privilege important in operational security?",opts:["It allows every user to act as an administrator","It limits the impact of accidents, misuse, and compromise","It makes systems easier to break","It eliminates the need for monitoring"],correct:1,exp:"Least privilege reduces the chance and impact of accidental or malicious actions by limiting access to what is truly necessary."},
+{id:194,domain:5,text:"What is the purpose of a backup strategy?",opts:["To automatically delete old files","To preserve data and support recovery after loss, damage, or corruption","To replace firewalls","To authenticate users"],correct:1,exp:"Backups are essential for recovering data and systems when files are lost, damaged, or affected by malware or disasters."},
+{id:195,domain:5,text:"Which security control is most likely to help after a malware infection has already begun?",opts:["A preventive firewall rule","An antivirus or endpoint response tool that detects and removes the malware","A password policy","A visible security camera"],correct:1,exp:"Antivirus and endpoint response tools can detect and remove malware once it is present, helping reduce impact and spread."},
+{id:196,domain:5,text:"What does data in use refer to?",opts:["Data being actively processed by a system","Data stored on a disk","Data traveling over a network","Data archived in a vault"],correct:0,exp:"Data in use is information that is being processed in memory or by an application, which requires different protections than stored or transmitted data."},
+{id:197,domain:5,text:"What is the primary purpose of a security incident ticket?",opts:["To replace the need for evidence","To track the status, ownership, and actions related to an incident","To generate passwords","To install software updates"],correct:1,exp:"Incident tickets organize response work, track ownership, and help ensure that actions are completed and documented."},
+{id:198,domain:5,text:"Which statement best describes malware?",opts:["A type of firewall rule","Malicious software designed to harm, steal, or disrupt systems","A backup archive format","A network routing protocol"],correct:1,exp:"Malware is any malicious software created to compromise systems, steal information, or disrupt business operations."},
+{id:199,domain:5,text:"Why is employee security awareness training important even when technical controls are strong?",opts:["Because people are often the weakest link and can be tricked into risky actions","Because training can replace all technical controls","Because employees should never use passwords","Because technical controls do not need monitoring"],correct:0,exp:"Users are often targeted through social engineering, so awareness training is essential even when strong technical protections are in place."},
+{id:200,domain:5,text:"What is the main reason an organization should retain logs for a defined period?",opts:["To make systems slower","To support investigations, audits, and accountability","To eliminate the need for backups","To bypass incident response"],correct:1,exp:"Retained logs provide evidence of activity, support investigations, and help satisfy compliance or audit requirements."}
+];
+
+var state = {
+  screen: 'home',
+  queue: [],
+  idx: 0,
+  selected: null,
+  answered: false,
+  sessionLog: [],
+  progress: {}
+};
+
+function domainOf(id){
+  for (var i=0;i<DOMAINS.length;i++){ if (DOMAINS[i].id===id) return DOMAINS[i]; }
+  return null;
+}
+
+function domainStats(domainId){
+  var seen=0, correct=0;
+  for (var i=0;i<QUESTIONS.length;i++){
+    var q = QUESTIONS[i];
+    if (q.domain!==domainId) continue;
+    var p = state.progress[q.id];
+    if (p){ seen+=p.seen; correct+=p.correct; }
+  }
+  return { seen: seen, correct: correct, pct: seen ? Math.round(100*correct/seen) : 0 };
+}
+
+function overallStats(){
+  var seen=0, correct=0;
+  for (var key in state.progress){
+    var p = state.progress[key];
+    seen+=p.seen; correct+=p.correct;
+  }
+  return { seen: seen, correct: correct, pct: seen ? Math.round(100*correct/seen) : 0 };
+}
+
+function missedPool(){
+  return QUESTIONS.filter(function(q){
+    var p = state.progress[q.id];
+    return p && p.lastWrong;
+  });
+}
+
+function shuffle(arr){
+  var a = arr.slice();
+  for (var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+  }
+  return a;
+}
+
+function prep(q){
+  var idxs=[0,1,2,3];
+  for (var i=idxs.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var tmp=idxs[i]; idxs[i]=idxs[j]; idxs[j]=tmp;
+  }
+  var opts = idxs.map(function(k){ return q.opts[k]; });
+  var correct = idxs.indexOf(q.correct);
+  var copy = {};
+  for (var key in q) copy[key]=q[key];
+  copy.opts = opts;
+  copy.correct = correct;
+  return copy;
+}
+
+function startSet(mode, domainId){
+  var pool;
+  if (mode==='mock') pool = QUESTIONS;
+  else if (mode==='domain') pool = QUESTIONS.filter(function(q){ return q.domain===domainId; });
+  else pool = missedPool();
+  if (!pool.length) return;
+  state.queue = shuffle(pool).map(prep);
+  state.idx = 0;
+  state.selected = null;
+  state.answered = false;
+  state.sessionLog = [];
+  state.screen = 'quiz';
+  render();
+}
+
+function selectOption(i){
+  if (state.answered) return;
+  var q = state.queue[state.idx];
+  state.selected = i;
+  state.answered = true;
+  var isCorrect = (i===q.correct);
+  var p = state.progress[q.id] || {seen:0, correct:0, lastWrong:false};
+  p.seen++;
+  if (isCorrect){ p.correct++; p.lastWrong=false; } else { p.lastWrong=true; }
+  state.progress[q.id] = p;
+  state.sessionLog.push({id:q.id, domain:q.domain, correct:isCorrect});
+  saveProgress();
+  render();
+}
+
+function nextQuestion(){
+  if (state.idx+1 >= state.queue.length){
+    state.screen = 'results';
+  } else {
+    state.idx++;
+    state.selected = null;
+    state.answered = false;
+  }
+  render();
+}
+
+function goHome(){
+  state.screen='home';
+  render();
+}
+
+async function loadProgress(){
+  try {
+    var res = await window.storage.get('cc-progress', false);
+    if (res && res.value) state.progress = JSON.parse(res.value);
+  } catch (e) {
+    state.progress = {};
+  }
+}
+
+async function saveProgress(){
+  try {
+    await window.storage.set('cc-progress', JSON.stringify(state.progress), false);
+  } catch (e) {
+    console.error('progress save failed', e);
+  }
+}
+
+function setPath(p){
+  var el = document.getElementById('termPath');
+  if (el) el.textContent = 'patch@cc-exam:~$ ' + p;
+}
+
+function renderHome(){
+  setPath('./start_prep.sh');
+  var missed = missedPool();
+  var overall = overallStats();
+  var rows = DOMAINS.map(function(d){
+    var st = domainStats(d.id);
+    var acc = st.seen ? (st.pct + '%') : '';
+    return '<button class="domain-row" data-action="start-domain" data-domain="'+d.id+'">' +
+      '<span class="d-idx">0'+d.id+'</span>' +
+      '<span class="d-name">'+d.name+'</span>' +
+      '<span class="d-bar-track"><span class="d-bar-fill" data-fill="'+d.weight+'"></span></span>' +
+      '<span class="d-weight">'+d.weight+'%</span>' +
+      '<span class="d-acc">'+acc+'</span>' +
+    '</button>';
+  }).join('');
+
+  var lifetime = overall.seen ? ('<div class="stat-line">lifetime: '+overall.correct+'/'+overall.seen+' correct ('+overall.pct+'%) &middot; percentages on the right show your accuracy per domain</div>') : '';
+
+  return '' +
+    '<div class="eyebrow">isc2 &middot; certified in cybersecurity</div>' +
+    '<h1 class="title">exam_outline.conf<span class="cursor"></span></h1>' +
+    '<p class="subtitle">100 original practice questions, weighted to match the official CC domain blueprint exactly.</p>' +
+    rows +
+    '<div class="hint">click a domain to drill it individually, or run the full weighted mock exam below</div>' +
+    '<div class="btn-row">' +
+      '<button class="btn primary" data-action="start-mock">run full mock exam &mdash; 100q</button>' +
+      '<button class="btn" data-action="start-missed" '+(missed.length? '':'disabled')+'>review missed ('+missed.length+')</button>' +
+    '</div>' +
+    lifetime;
+}
+
+function renderQuiz(){
+  var q = state.queue[state.idx];
+  var d = domainOf(q.domain);
+  setPath('./quiz --domain='+d.slug);
+  var total = state.queue.length;
+  var letters = ['A','B','C','D'];
+
+  var optsHtml = q.opts.map(function(opt,i){
+    var cls = 'opt';
+    var tag = '';
+    if (state.answered){
+      if (i===q.correct){ cls+=' correct'; tag='<span class="tag">[ OK ]</span>'; }
+      else if (i===state.selected){ cls+=' wrong'; tag='<span class="tag">[FAIL]</span>'; }
+    }
+    return '<button class="'+cls+'" data-action="select-option" data-index="'+i+'" '+(state.answered?'disabled':'')+'>' +
+      '<span class="k">'+letters[i]+'</span><span class="opt-text">'+opt+'</span>'+tag+
+    '</button>';
+  }).join('');
+
+  var explain = '';
+  if (state.answered){
+    var verdict = (state.selected===q.correct) ? 'correct.' : 'not quite.';
+    explain = '<div class="explain"><b>'+verdict+'</b> '+q.exp+'</div>';
+  }
+
+  var isLast = (state.idx+1 >= total);
+  var footer = '<div class="footer-row"><button class="link-btn" data-action="home">quit to menu</button>';
+  if (state.answered){
+    footer += '<button class="btn primary" data-action="next">'+(isLast?'see results &rarr;':'next question &rarr;')+'</button>';
+  }
+  footer += '</div>';
+
+  return '' +
+    '<div class="qmeta"><span>q '+(state.idx+1)+'/'+total+'</span><span>0'+d.id+' '+d.slug+'</span></div>' +
+    '<div class="qprogress-track"><div class="qprogress-fill" style="width:'+Math.round(100*state.idx/total)+'%"></div></div>' +
+    '<div class="qtext">'+q.text+'</div>' +
+    optsHtml +
+    explain +
+    footer;
+}
+
+function renderResults(){
+  setPath('./quiz --report');
+  var total = state.sessionLog.length;
+  var correctCount = state.sessionLog.filter(function(r){ return r.correct; }).length;
+  var pct = total ? Math.round(100*correctCount/total) : 0;
+
+  var byDomain = {};
+  state.sessionLog.forEach(function(r){
+    if (!byDomain[r.domain]) byDomain[r.domain] = {seen:0, correct:0};
+    byDomain[r.domain].seen++;
+    if (r.correct) byDomain[r.domain].correct++;
+  });
+  var rows = Object.keys(byDomain).map(function(dId){
+    var d = domainOf(Number(dId));
+    var s = byDomain[dId];
+    var p = Math.round(100*s.correct/s.seen);
+    return '<div class="domain-stat-row">' +
+      '<span class="d-idx">0'+d.id+'</span>' +
+      '<span class="d-name">'+d.name+'</span>' +
+      '<span class="d-bar-track"><span class="d-bar-fill" style="width:'+p+'%"></span></span>' +
+      '<span class="d-weight">'+p+'%</span>' +
+    '</div>';
+  }).join('');
+
+  var missedThisSession = total - correctCount;
+
+  return '' +
+    '<div class="eyebrow">session complete</div>' +
+    '<div class="score-big">'+correctCount+'/'+total+'</div>' +
+    '<div class="score-sub">'+pct+'% correct this session</div>' +
+    rows +
+    '<div class="btn-row">' +
+      (missedThisSession ? '<button class="btn" data-action="start-missed">review missed ('+missedPool().length+')</button>' : '') +
+      '<button class="btn primary" data-action="home">back to menu</button>' +
+    '</div>';
+}
+
+function render(){
+  var app = document.getElementById('app');
+  if (state.screen==='home'){
+    app.innerHTML = renderHome();
+    requestAnimationFrame(function(){
+      document.querySelectorAll('.d-bar-fill[data-fill]').forEach(function(el){
+        el.style.width = el.getAttribute('data-fill') + '%';
+      });
+    });
+  } else if (state.screen==='quiz'){
+    app.innerHTML = renderQuiz();
+  } else {
+    app.innerHTML = renderResults();
+  }
+}
+
+document.getElementById('app').addEventListener('click', function(e){
+  var btn = e.target.closest('[data-action]');
+  if (!btn || btn.disabled) return;
+  var action = btn.getAttribute('data-action');
+  if (action==='start-mock') startSet('mock');
+  else if (action==='start-domain') startSet('domain', Number(btn.getAttribute('data-domain')));
+  else if (action==='start-missed') startSet('missed');
+  else if (action==='select-option') selectOption(Number(btn.getAttribute('data-index')));
+  else if (action==='next') nextQuestion();
+  else if (action==='home') goHome();
+});
+
+loadProgress().then(render);
+</script>
+</body>
+</html>
