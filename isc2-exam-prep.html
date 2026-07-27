@@ -535,13 +535,43 @@ function shuffle(arr){
 }
 
 function prep(q){
-  var idxs=[0,1,2,3];
-  for (var i=idxs.length-1;i>0;i--){
-    var j = Math.floor(Math.random()*(i+1));
-    var tmp=idxs[i]; idxs[i]=idxs[j]; idxs[j]=tmp;
+  var options = q.opts.map(function(text, index){
+    return {text:text, index:index};
+  });
+
+  var shuffled = shuffle(options);
+  var correctOption = shuffled.find(function(item){
+    return item.index === q.correct;
+  });
+
+  if (correctOption){
+    var longestIndex = -1;
+    var longestLength = -1;
+    shuffled.forEach(function(item, index){
+      if (item.text.length > longestLength){
+        longestLength = item.text.length;
+        longestIndex = index;
+      }
+    });
+
+    if (shuffled[longestIndex] && shuffled[longestIndex].index === q.correct){
+      var swapTarget = -1;
+      for (var i=0;i<shuffled.length;i++){
+        if (shuffled[i].index !== q.correct && shuffled[i].text.length < longestLength){
+          swapTarget = i;
+          break;
+        }
+      }
+      if (swapTarget !== -1){
+        var tmp = shuffled[longestIndex];
+        shuffled[longestIndex] = shuffled[swapTarget];
+        shuffled[swapTarget] = tmp;
+      }
+    }
   }
-  var opts = idxs.map(function(k){ return q.opts[k]; });
-  var correct = idxs.indexOf(q.correct);
+
+  var opts = shuffled.map(function(item){ return item.text; });
+  var correct = shuffled.findIndex(function(item){ return item.index === q.correct; });
   var copy = {};
   for (var key in q) copy[key]=q[key];
   copy.opts = opts;
