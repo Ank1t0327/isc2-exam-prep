@@ -483,6 +483,8 @@ var QUESTIONS = [
 {id:200,domain:5,text:"What is the main reason an organization should retain logs for a defined period?",opts:["To make systems slower","To support investigations, audits, and accountability","To eliminate the need for backups","To bypass incident response"],correct:1,exp:"Retained logs provide evidence of activity, support investigations, and help satisfy compliance or audit requirements."}
 ];
 
+var PRACTICE_TEST_SIZE = 100;
+
 var state = {
   screen: 'home',
   queue: [],
@@ -585,7 +587,13 @@ function startSet(mode, domainId){
   else if (mode==='domain') pool = QUESTIONS.filter(function(q){ return q.domain===domainId; });
   else pool = missedPool();
   if (!pool.length) return;
-  state.queue = shuffle(pool).map(prep);
+
+  var testPool = pool;
+  if (mode==='mock'){
+    testPool = shuffle(pool).slice(0, PRACTICE_TEST_SIZE);
+  }
+
+  state.queue = testPool.map(prep);
   state.idx = 0;
   state.selected = null;
   state.answered = false;
@@ -668,11 +676,11 @@ function renderHome(){
   return '' +
     '<div class="eyebrow">isc2 &middot; certified in cybersecurity</div>' +
     '<h1 class="title">exam_outline.conf<span class="cursor"></span></h1>' +
-    '<p class="subtitle">100 original practice questions, weighted to match the official CC domain blueprint exactly.</p>' +
+    '<p class="subtitle">100-question practice tests, structured to mirror the ISC2 CC exam format and domain weighting.</p>' +
     rows +
-    '<div class="hint">click a domain to drill it individually, or run the full weighted mock exam below</div>' +
+    '<div class="hint">click a domain to drill it individually, or launch a fresh 100-question practice test below</div>' +
     '<div class="btn-row">' +
-      '<button class="btn primary" data-action="start-mock">run full mock exam &mdash; 100q</button>' +
+      '<button class="btn primary" data-action="start-mock">run practice test &mdash; 100q</button>' +
       '<button class="btn" data-action="start-missed" '+(missed.length? '':'disabled')+'>review missed ('+missed.length+')</button>' +
     '</div>' +
     lifetime;
