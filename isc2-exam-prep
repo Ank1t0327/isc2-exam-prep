@@ -384,6 +384,14 @@ var QUESTIONS = [
 ];
 
 var PRACTICE_TEST_SIZE = 100;
+var PRACTICE_TESTS = 4;
+var PRACTICE_TEST_DOMAIN_COUNTS = {
+  1: 26,
+  2: 10,
+  3: 22,
+  4: 24,
+  5: 18
+};
 
 var state = {
   screen: 'home',
@@ -481,7 +489,30 @@ function prep(q){
   return copy;
 }
 
-function startSet(mode, domainId){
+function buildPracticeTest(testVariant){
+  var byDomain = {};
+  for (var domainId in PRACTICE_TEST_DOMAIN_COUNTS){
+    byDomain[domainId] = QUESTIONS.filter(function(q){ return q.domain===Number(domainId); });
+  }
+
+  var selected = [];
+  Object.keys(PRACTICE_TEST_DOMAIN_COUNTS).forEach(function(domainId){
+    var domainQuestions = shuffle(byDomain[domainId]);
+    var count = PRACTICE_TEST_DOMAIN_COUNTS[domainId];
+    selected = selected.concat(domainQuestions.slice(0, count));
+  });
+
+  var shuffled = shuffle(selected);
+  if (testVariant > 1){
+    for (var i=0;i<testVariant;i++){
+      shuffled = shuffle(shuffled);
+    }
+  }
+
+  return shuffled.slice(0, PRACTICE_TEST_SIZE).map(prep);
+}
+
+function startSet(mode, domainId, testVariant){
   var pool;
   if (mode==='mock') pool = QUESTIONS;
   else if (mode==='domain') pool = QUESTIONS.filter(function(q){ return q.domain===domainId; });
@@ -490,7 +521,7 @@ function startSet(mode, domainId){
 
   var testPool = pool;
   if (mode==='mock'){
-    testPool = shuffle(pool).slice(0, PRACTICE_TEST_SIZE);
+    testPool = buildPracticeTest(testVariant || 1);
   }
 
   state.queue = testPool.map(prep);
@@ -576,11 +607,14 @@ function renderHome(){
   return '' +
     '<div class="eyebrow">isc2 &middot; certified in cybersecurity</div>' +
     '<h1 class="title">exam_outline.conf<span class="cursor"></span></h1>' +
-    '<p class="subtitle">100-question practice tests, structured to mirror the ISC2 CC exam format and domain weighting.</p>' +
+    '<p class="subtitle">Four 100-question practice tests, structured to mirror the ISC2 CC exam format and domain weighting.</p>' +
     rows +
-    '<div class="hint">click a domain to drill it individually, or launch a fresh 100-question practice test below</div>' +
+    '<div class="hint">click a domain to drill it individually, or launch one of the four full-length practice tests below</div>' +
     '<div class="btn-row">' +
-      '<button class="btn primary" data-action="start-mock">run practice test &mdash; 100q</button>' +
+      '<button class="btn primary" data-action="start-mock" data-test-id="1">practice test 1 &mdash; 100q</button>' +
+      '<button class="btn primary" data-action="start-mock" data-test-id="2">practice test 2 &mdash; 100q</button>' +
+      '<button class="btn primary" data-action="start-mock" data-test-id="3">practice test 3 &mdash; 100q</button>' +
+      '<button class="btn primary" data-action="start-mock" data-test-id="4">practice test 4 &mdash; 100q</button>' +
       '<button class="btn" data-action="start-missed" '+(missed.length? '':'disabled')+'>review missed ('+missed.length+')</button>' +
     '</div>' +
     lifetime;
@@ -684,7 +718,7 @@ document.getElementById('app').addEventListener('click', function(e){
   var btn = e.target.closest('[data-action]');
   if (!btn || btn.disabled) return;
   var action = btn.getAttribute('data-action');
-  if (action==='start-mock') startSet('mock');
+  if (action==='start-mock') startSet('mock', null, Number(btn.getAttribute('data-test-id')) || 1);
   else if (action==='start-domain') startSet('domain', Number(btn.getAttribute('data-domain')));
   else if (action==='start-missed') startSet('missed');
   else if (action==='select-option') selectOption(Number(btn.getAttribute('data-index')));
