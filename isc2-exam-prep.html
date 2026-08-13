@@ -493,6 +493,42 @@ var PRACTICE_TEST_DOMAIN_COUNTS = {
   5: 18
 };
 
+function rotateOptions(opts, offset){
+  var rotated = opts.slice();
+  var shift = offset % rotated.length;
+  if (shift < 0) shift += rotated.length;
+  return rotated.slice(shift).concat(rotated.slice(0, shift));
+}
+
+function buildQuestionVariants(baseQuestions){
+  var variants = [];
+  var styles = [
+    function(text){ return text; },
+    function(text){ return 'In practice, ' + text; },
+    function(text){ return 'For review, ' + text; },
+    function(text){ return 'When applying this concept, ' + text; }
+  ];
+
+  baseQuestions.forEach(function(q){
+    var questionVariants = styles.map(function(style, styleIndex){
+      var copy = {};
+      for (var key in q) copy[key] = q[key];
+      copy.baseId = q.id;
+      copy.id = Number(q.id) * 10 + styleIndex + 1;
+      copy.variantId = copy.id;
+      copy.text = style(q.text);
+      copy.opts = rotateOptions(q.opts, styleIndex + 1);
+      copy.correct = copy.opts.indexOf(q.opts[q.correct]);
+      return copy;
+    });
+    variants.push(questionVariants);
+  });
+
+  return variants;
+}
+
+var QUESTION_VARIANTS = buildQuestionVariants(QUESTIONS);
+
 var state = {
   screen: 'home',
   queue: [],
@@ -590,26 +626,9 @@ function prep(q){
 }
 
 function buildPracticeTest(testVariant){
-  var byDomain = {};
-  for (var domainId in PRACTICE_TEST_DOMAIN_COUNTS){
-    byDomain[domainId] = QUESTIONS.filter(function(q){ return q.domain===Number(domainId); });
-  }
-
-  var selected = [];
-  Object.keys(PRACTICE_TEST_DOMAIN_COUNTS).forEach(function(domainId){
-    var domainQuestions = shuffle(byDomain[domainId]);
-    var count = PRACTICE_TEST_DOMAIN_COUNTS[domainId];
-    selected = selected.concat(domainQuestions.slice(0, count));
-  });
-
-  var shuffled = shuffle(selected);
-  if (testVariant > 1){
-    for (var i=0;i<testVariant;i++){
-      shuffled = shuffle(shuffled);
-    }
-  }
-
-  return shuffled.slice(0, PRACTICE_TEST_SIZE).map(prep);
+  var variantIndex = (testVariant - 1) % 4;
+  var selected = QUESTION_VARIANTS.map(function(variants){ return variants[variantIndex]; });
+  return shuffle(selected).slice(0, PRACTICE_TEST_SIZE).map(prep);
 }
 
 function startSet(mode, domainId, testVariant){
